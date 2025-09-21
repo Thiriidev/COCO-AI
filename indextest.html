@@ -6,6 +6,107 @@
   <title>iOS Role Based App with S3 Upload</title>
   <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1410.0.min.js"></script>
   <style>
+    /* History Tab Styles */
+.history-container {
+    margin-top: 30px;
+    width: 100%;
+}
+
+.history-dropdown {
+    width: 100%;
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px var(--shadow);
+    color: var(--text);
+    overflow: hidden;
+}
+
+.history-dropdown summary {
+    padding: 20px 24px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none; /* Hide default arrow */
+    position: relative;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.history-dropdown summary:hover {
+    background: var(--border);
+}
+
+.history-dropdown summary::after {
+    content: '▾';
+    font-size: 24px;
+    transform: rotate(0deg);
+    transition: transform 0.3s ease;
+}
+
+.history-dropdown[open] summary::after {
+    transform: rotate(180deg);
+}
+
+.history-list {
+    padding: 10px 24px;
+    margin: 0;
+    list-style: none;
+    background: #3a3a3a;
+}
+
+.history-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    color: #b0b0b0;
+}
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
+.history-item-name {
+    flex: 1;
+    font-size: 14px;
+    word-break: break-all;
+    padding-right: 10px;
+}
+
+.history-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.history-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    color: var(--text);
+}
+
+.history-actions .update-btn {
+    background: #e28e1d;
+    color: white;
+}
+
+.history-actions .delete-btn {
+    background: #c1491b;
+    color: white;
+}
+
+.history-actions button:hover {
+    opacity: 0.8;
+}
     :root {
       --bg: #f8f9fa;
       --text: #2c3e50;
@@ -566,53 +667,40 @@ textarea::placeholder {
       transform: translateY(0);
     }
     
-    .chatbot-card {
-      background: var(--gradient);
-      border-radius: 50%;
-      width: 80px;
-      height: 80px;
-      margin: 32px auto;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      box-shadow: 0 8px 25px var(--shadow);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-    }
-    
-    .chatbot-card::before {
-      content: '';
-      position: absolute;
-      top: -4px;
-      left: -4px;
-      right: -4px;
-      bottom: -4px;
-      background: var(--gradient);
-      border-radius: 50%;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      z-index: -1;
-    }
-    
-    .chatbot-card:hover::before {
-      opacity: 0.3;
-    }
-    
-    .chatbot-card:hover {
-      transform: translateY(-4px) scale(1.05);
-      box-shadow: 0 12px 35px var(--shadow);
-    }
-    
-    .chatbot-card:active { 
-      transform: translateY(-2px) scale(1.02); 
-    }
-    
-    .chatbot-card svg {
-      width: 36px;
-      height: 36px;
-      fill: white;
-    }
+    /* AI Button Styles */
+.ai-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 50px;
+  font-size: 24px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  background: linear-gradient(90deg, #fab133 0%, #e28e1d 50%, #c1491b 100%);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+  font-family: inherit;
+}
+
+.ai-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.5);
+}
+
+.ai-button:active {
+  transform: translateY(0);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+.ai-button .icon {
+  width: 30px;
+  height: 30px;
+  margin-right: 12px;
+  fill: white;
+}
     
     /* Login Screen Specific */
     .login-container {
@@ -841,35 +929,139 @@ textarea::placeholder {
       </section>
 
       <!-- Upload Page -->
-      <section id="upload-screen" class="hidden">
-        <div class="title" id="upload-title"></div>
-        <div class="upload-container">
-          <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
-            📁 Choose Files
-          </button>
-          <input type="file" id="fileInput" multiple class="hidden">
-        </div>
-        <div class="file-list" id="fileList"></div>
-        <div class="chatbot-card" onclick="goToChatbot()">
-          <svg viewBox="0 0 24 24">
-            <path d="M4 4h16v12H5.17L4 17.17V4z"/>
-          </svg>
-        </div>
-      </section>
-
-      <!-- Chatbot -->
-      <section id="chatbot-screen" class="hidden">
-        <div class="chat-box">
-          <div class="messages" id="chatMessages">
-            <div class="bubble bot">👋 Hi! I'm your AI assistant. How can I help you today?</div>
-          </div>
-          <button class="report-btn hidden" id="reportBtn" onclick="openReport()">🚨 Report a Problem</button>
-          <div class="chat-input">
-            <input type="text" id="chatInput" placeholder="Type your message...">
-            <button onclick="sendMessage()">Send</button>
-          </div>
-        </div>
-      </section>
+<section id="upload-screen" class="hidden">
+    <div class="title" id="upload-title"></div>
+    <div class="upload-container">
+      <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+        📁 Upload Files
+      </button>
+      <input type="file" id="fileInput" multiple class="hidden">
+    </div>
+    <div class="file-list" id="fileList"></div>
+    <div class="history-container">
+        <details class="history-dropdown" id="history-hr" style="display: none;">
+            <summary>HR File History</summary>
+            <ul class="history-list">
+                <li class="history-item">
+                    <span class="history-item-name">HR-Guide_-Policy-and-Procedure-Template.pdf</span>
+                    <div class="history-actions">
+                        <button class="update-btn">Update</button>
+                        <button class="delete-btn">Delete</button>
+                    </div>
+                </li>
+                <li class="history-item">
+                    <span class="history-item-name">Sharpnack_Handbook_January_2023_6_final_correcting_holiday_and_weapons.pdf</span>
+                    <div class="history-actions">
+                        <button class="update-btn">Update</button>
+                        <button class="delete-btn">Delete</button>
+                    </div>
+                </li>
+            </ul>
+        </details>
+    
+        <details class="history-dropdown" id="history-manufacture" style="display: none;">
+            <summary>Manufacturing File History</summary>
+            <ul class="history-list">
+                <li class="history-item">
+                    <span class="history-item-name">EV_Battery_Assembly_Booklet_2023.pdf</span>
+                    <div class="history-actions">
+                        <button class="update-btn">Update</button>
+                        <button class="delete-btn">Delete</button>
+                    </div>
+                </li>
+                <li class="history-item">
+                    <span class="history-item-name">199375_NPB_InstallationManual_30Mar2020.pdf</span>
+                    <div class="history-actions">
+                        <button class="update-btn">Update</button>
+                        <button class="delete-btn">Delete</button>
+                    </div>
+                </li>
+                <li class="history-item">
+                    <span class="history-item-name">usabc_manual_rev2.pdf</span>
+                    <div class="history-actions">
+                        <button class="update-btn">Update</button>
+                        <button class="delete-btn">Delete</button>
+                    </div>
+                </li>
+                <li class="history-item">
+                    <span class="history-item-name">606320d39e94aa672637a2d215a3311b9622.pdf</span>
+                    <div class="history-actions">
+                        <button class="update-btn">Update</button>
+                        <button class="delete-btn">Delete</button>
+                    </div>
+                </li>
+                <li class="history-item">
+                    <span class="history-item-name">Kinematic Calibration Operating Guide for e-Series.pdf</span>
+                    <div class="history-actions">
+                        <button class="update-btn">Update</button>
+                        <button class="delete-btn">Delete</button>
+                    </div>
+                </li>
+                <li class="history-item">
+                    <span class="history-item-name">FULLTEXT01.pdf</span>
+                    <div class="history-actions">
+                        <button class="update-btn">Update</button>
+                        <button class="delete-btn">Delete</button>
+                    </div>
+                </li>
+                <li class="history-item">
+                    <span class="history-item-name">Automotive Art Troubleshotting Paint Defects Guide.pdf</span>
+                    <div class="history-actions">
+                        <button class="update-btn">Update</button>
+                        <button class="delete-btn">Delete</button>
+                    </div>
+                </li>
+                <li class="history-item">
+                    <span class="history-item-name">vehicle-and-driver-safety-policy.pdf</span>
+                    <div class="history-actions">
+                        <button class="update-btn">Update</button>
+                        <button class="delete-btn">Delete</button>
+                    </div>
+                </li>
+                <li class="history-item">
+                    <span class="history-item-name">Paint_Shop_Solutions_Guide_60-4402-8006-7_LR.pdf</span>
+                    <div class="history-actions">
+                        <button class="update-btn">Update</button>
+                        <button class="delete-btn">Delete</button>
+                    </div>
+                </li>
+                <li class="history-item">
+                    <span class="history-item-name">1106D Disassembly and Assembly.pdf</span>
+                    <div class="history-actions">
+                        <button class="update-btn">Update</button>
+                        <button class="delete-btn">Delete</button>
+                    </div>
+                </li>
+            </ul>
+        </details>
+    </div>
+    <!-- 🔹 REPLACED: New AI Button instead of chatbot-card -->
+    <div style="text-align: center; margin: 32px 0;">
+      <button class="ai-button" onclick="goToChatbot()">
+        <svg class="icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 2H4C2.9 2 2 2.9 2 4V16C2 17.1 2.9 18 4 18H18L22 22V4C22 2.9 21.1 2 20 2ZM18 14H6V12H18V14ZM18 11H6V9H18V11ZM18 8H6V6H18V8Z" fill="white"/>
+          <path d="M19.38 4.75L20.82 3.3C21.01 3.11 21.32 3.11 21.51 3.3L22.95 4.75C23.14 4.94 23.14 5.25 22.95 5.44L21.51 6.88C21.32 7.07 21.01 7.07 20.82 6.88L19.38 5.44C19.19 5.25 19.19 4.94 19.38 4.75Z" fill="white"/>
+          <path d="M16 1L17.5 2.5L19 1L17.5 0L16 1Z" fill="white"/>
+          <path d="M17 10L18 11L19 10L18 9L17 10Z" fill="white"/>
+        </svg>
+        Coco AI
+      </button>
+    </div>
+  </section>
+  
+  <!-- Chatbot -->
+  <section id="chatbot-screen" class="hidden">
+    <div class="chat-box">
+      <div class="messages" id="chatMessages">
+        <div class="bubble bot">👋 Hi! I'm your AI assistant. How can I help you today?</div>
+      </div>
+      <button class="report-btn hidden" id="reportBtn" onclick="openReport()">🚨 Report a Problem</button>
+      <div class="chat-input">
+        <input type="text" id="chatInput" placeholder="Type your message...">
+        <button onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+  </section>
 
       <!-- Report -->
       <section id="report-screen" class="hidden">
@@ -882,6 +1074,72 @@ textarea::placeholder {
   </div>
 
 <script>
+    // Function to handle file upload
+function uploadFile() {
+    const fileInput = document.getElementById('file-input');
+    const file = fileInput.files[0];
+    const fileListElement = document.getElementById('fileList');
+
+    if (file) {
+        // Show the loading indicator
+        fileListElement.innerHTML = `<div class="loading-spinner"></div>`;
+
+        const uploadPath = `${currentDept}/${file.name}`;
+
+        const params = {
+            Bucket: bucketName,
+            Key: uploadPath,
+            Body: file,
+            ACL: 'private'
+        };
+
+        s3.upload(params, function (err, data) {
+            if (err) {
+                console.error("Upload Error:", err);
+                fileListElement.innerText = `Error uploading file: ${err.message}`;
+                return;
+            }
+
+            // Display success message
+            fileListElement.innerHTML = `File uploaded successfully!<br>
+                                         <span class="file-name">${file.name}</span><br>
+                                         <span class="file-size">${(file.size / 1024).toFixed(2)} KB</span>`;
+
+            // 🔹 NEW: Add the uploaded file to the history list
+            const newFileHTML = `
+                <li class="history-item">
+                    <span class="history-item-name">${file.name}</span>
+                    <div class="history-actions">
+                        <button class="update-btn">Update</button>
+                        <button class="delete-btn">Delete</button>
+                    </div>
+                </li>
+            `;
+
+            let historyListId = '';
+            let historyTabId = '';
+            if (currentDept === 'HR') {
+                historyListId = 'history-hr';
+            } else if (currentDept === 'MANUFACTURE') {
+                historyListId = 'history-manufacture';
+            }
+
+            if (historyListId) {
+                const historyList = document.querySelector(`#${historyListId} .history-list`);
+                const historyTab = document.getElementById(historyListId);
+                
+                // Add the new item to the top of the list
+                historyList.insertAdjacentHTML('afterbegin', newFileHTML);
+                
+                // Ensure the history tab is visible and open
+                historyTab.style.display = 'block';
+                historyTab.open = true;
+            }
+        });
+    } else {
+        alert('Please select a file to upload.');
+    }
+}
   // Your existing JavaScript code remains the same
   const header = document.getElementById('header');
   const backBtn = document.getElementById('backBtn');
@@ -924,8 +1182,8 @@ textarea::placeholder {
     header.innerText = {
       role: "Coco AI",
       login: "Sign In",
-      dept: "Departments",
-      upload: "Upload Files",
+      dept: "Coco AI",
+      upload: "Coco AI",
       chatbot: "AI Assistant",
       report: "Report Issue"
     }[screen];
@@ -974,10 +1232,22 @@ function goStaff() {
 }
 
 function openUpload(folder) {
-  historyStack.push("dept");
-  currentDept = folder;
-  show('upload');
-  document.getElementById('upload-title').innerText = folder === 'HR' ? 'Human Resources' : 'Manufacturing';
+    historyStack.push("dept");
+    currentDept = folder;
+    show('upload');
+    document.getElementById('upload-title').innerText = folder === 'HR' ? 'Human Resources' : 'Manufacturing';
+    
+    // 🔹 NEW: Show or hide the correct history tab based on the department
+    const hrHistory = document.getElementById('history-hr');
+    const manufactureHistory = document.getElementById('history-manufacture');
+    
+    if (folder === 'HR') {
+        hrHistory.style.display = 'block';
+        manufactureHistory.style.display = 'none';
+    } else if (folder === 'MANUFACTURE') {
+        hrHistory.style.display = 'none';
+        manufactureHistory.style.display = 'block';
+    }
 }
 
 function goToChatbot() { 
@@ -1062,7 +1332,7 @@ function handleFileUpload(files) {
       
       // Reset upload button when all files are processed
       if (uploadCount === files.length) {
-        uploadBtn.textContent = '📁 Choose Files';
+        uploadBtn.textContent = '📁 Upload Files';
         uploadBtn.classList.remove('loading');
       }
     });
