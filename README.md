@@ -27,8 +27,25 @@ Immediate Access to Information – Reduces downtime for technicians and operato
 Manager Dashboard – Managers can track uploaded files, monitor backlog, and gain insights through usage analytics.
 Paperless, Centralized Reference System – One-stop hub for all internal documentation.
 
+
+
 Impact
 
 For Staff: Natural, guided assistance and faster troubleshooting reduce downtime.
 For Managers: More time to focus on strategic tasks instead of handling repetitive queries.
 For Organizations: Increased productivity, streamlined operations, and improved sustainability by reducing reliance on paper-based manuals.
+
+CORE TEAM MEMBERS
+1. YAKNESHA
+(Electrical & Electronics Engineering)
+TP080308
+2.THIRIIDEV (Mechatronics Engineering)
+TP081155
+3.WANG CHEE XUN (Mechatronics Engineering)
+TP080593
+4.KYAW KO KO
+(Computer Science Artificial Intelligence)
+TP079671
+5.CARTHIKGAYEN
+(Computer Science Cybersecurity)
+TP079647
